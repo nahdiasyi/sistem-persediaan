@@ -27,8 +27,8 @@ class Kategori extends Model
     ];
 
     // Relasi jika ada, misal:
-    // public function barang()
-    // {
-    //     return $this->hasMany(Barang::class, 'id_kategori', 'id_kategori');
-    // }
+    public function barang()
+    {
+        return $this->hasMany(Barang::class, 'id_kategori', 'id_kategori');
+    }
 }
