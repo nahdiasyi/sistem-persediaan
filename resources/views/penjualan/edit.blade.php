@@ -44,12 +44,12 @@
 </div>
 
 <script>
-let details = {!! json_encode($penjualan->detailPenjualan->map(fn($d) => [
-    'kode_barang' => $d->kode_barang,
-    'jumlah' => $d->jumlah,
-    'harga' => $d->harga,
+// let details = {!! json_encode($penjualan->detailPenjualan->map(fn($d) => [
+//     'kode_barang' => $d->kode_barang,
+//     'jumlah' => $d->jumlah,
+//     'harga' => $d->harga,
 
-])) !!};
+// ])) !!};
 
 function renderTable() {
     let html = '';

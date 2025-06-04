@@ -48,26 +48,17 @@
 
             </li>
             <li class="heading">TRANSAKSI</li>
-            {{-- <li>
-                <a class="{{ Route::is('permintaan.create') ? 'active' : '' }}"
-                    href="{{ route('permintaan.create') }}"><i class="sidebar-item-icon fa fa-clipboard-list"></i>
-                    <span class="nav-label">Permintaan</span>
+            <li>
+                <a class="{{ Route::is('barang.*') ? 'active' : '' }}" href="{{ route('pembelian.index') }}"><i
+                        class="sidebar-item-icon fa fa-box"></i>
+                    <span class="nav-label">Pembelian</span>
                 </a>
-            </li> --}}
-            <li class="nav-item">
-                <a href="{{ url('/pembelian') }}" class="nav-link">
-                    <i class="nav-icon fas fa-box"></i>
-                    <p>Pembelian</p>
-                </a>
-
             </li>
             <li>
-                <li class="nav-item">
-                    <a href="{{ route('penjualan.index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-box"></i>
-                        <p>Penjualan</p>
-                    </a>
-                </li>
+                <a class="{{ Route::is('penjualan.*') ? 'active' : '' }}" href="{{ route('penjualan.index') }}"><i
+                        class="sidebar-item-icon fa fa-box"></i>
+                    <span class="nav-label">Penjualan</span>
+                </a>
             </li>
             <li>
                 <li class="nav-item">

@@ -9,6 +9,10 @@ class Pembelian extends Model
     protected $primaryKey = 'id_pembelian';
     public $incrementing = false;
     public $timestamps = false;
+    protected $casts = [
+        'tanggal' => 'datetime',
+    ];
+
 
     protected $fillable = ['id_pembelian', 'id_supplier', 'id_user', 'tanggal'];
 

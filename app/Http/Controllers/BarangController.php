@@ -18,6 +18,7 @@ class BarangController extends Controller
     // Menampilkan form tambah barang
     public function create()
     {
+        // dd('halo');
         $kategoris = Kategori::all();
         return view('barang.create', compact('kategoris'));
     }
