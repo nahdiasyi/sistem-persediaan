@@ -18,7 +18,6 @@ class BarangController extends Controller
     // Menampilkan form tambah barang
     public function create()
     {
-        // dd('halo');
         $kategoris = Kategori::all();
         return view('barang.create', compact('kategoris'));
     }
@@ -27,28 +26,31 @@ class BarangController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'Nama_Barang' => 'required|string|max:255',
-            'Harga_Beli' => 'required|numeric',
-            'Harga_Jual' => 'required|numeric',
-            'Nilai' => 'nullable|string|max:100',
+            'nama_barang' => 'required|string|max:255',
+            'harga_beli' => 'required|numeric',
+            'harga_jual' => 'required|numeric',
             'Satuan' => 'nullable|string|max:50',
-            'Merek' => 'nullable|string|max:100',
-            'Id_Kategori' => 'required|exists:kategori,Id_kategori',
+            'merek' => 'nullable|string|max:100',
+            'stok' => 'nullable|integer|min:0',
+            'keterangan' => 'nullable|in:stok tersedia,stok hampir habis',
+            'id_kategori' => 'required|exists:kategori,id_kategori',
         ]);
 
-        // Generate ID Barang otomatis jika diperlukan
-        $latestId = Barang::max('Id_Barang');
-        $newId = 'BRG' . str_pad((intval(substr($latestId, 3)) + 1), 4, '0', STR_PAD_LEFT);
+        // Generate kode_barang otomatis (misalnya: BRG0001, BRG0002, dst.)
+        $latest = Barang::max('kode_barang');
+        $number = $latest ? intval(substr($latest, 3)) + 1 : 1;
+        $newKode = 'BRG' . str_pad($number, 4, '0', STR_PAD_LEFT);
 
         Barang::create([
-            'Id_Barang' => $newId,
-            'Nama_Barang' => $request->Nama_Barang,
-            'Harga_Beli' => $request->Harga_Beli,
-            'Harga_Jual' => $request->Harga_Jual,
-            'Nilai' => $request->Nilai,
+            'kode_barang' => $newKode,
+            'nama_barang' => $request->nama_barang,
+            'harga_beli' => $request->harga_beli,
+            'harga_jual' => $request->harga_jual,
             'Satuan' => $request->Satuan,
-            'Merek' => $request->Merek,
-            'Id_Kategori' => $request->Id_Kategori,
+            'merek' => $request->merek,
+            'stok' => $request->stok ?? 0,
+            'keterangan' => $request->keterangan,
+            'id_kategori' => $request->id_kategori,
         ]);
 
         return redirect()->route('barang.index')->with('success', 'Barang berhasil ditambahkan.');
@@ -66,25 +68,27 @@ class BarangController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'Nama_Barang' => 'required|string|max:255',
-            'Harga_Beli' => 'required|numeric',
-            'Harga_Jual' => 'required|numeric',
-            'Nilai' => 'nullable|string|max:100',
+            'nama_barang' => 'required|string|max:255',
+            'harga_beli' => 'required|numeric',
+            'harga_jual' => 'required|numeric',
             'Satuan' => 'nullable|string|max:50',
-            'Merek' => 'nullable|string|max:100',
-            'Id_Kategori' => 'required|exists:kategori,Id_kategori',
+            'merek' => 'nullable|string|max:100',
+            'stok' => 'nullable|integer|min:0',
+            'keterangan' => 'nullable|string|max:255',
+            'id_kategori' => 'required|exists:kategori,id_kategori',
         ]);
 
         $barang = Barang::findOrFail($id);
 
         $barang->update([
-            'Nama_Barang' => $request->Nama_Barang,
-            'Harga_Beli' => $request->Harga_Beli,
-            'Harga_Jual' => $request->Harga_Jual,
-            'Nilai' => $request->Nilai,
+            'nama_barang' => $request->nama_barang,
+            'harga_beli' => $request->harga_beli,
+            'harga_jual' => $request->harga_jual,
             'Satuan' => $request->Satuan,
-            'Merek' => $request->Merek,
-            'Id_Kategori' => $request->Id_Kategori,
+            'merek' => $request->merek,
+            'stok' => $request->stok ?? $barang->stok,
+            'keterangan' => $request->keterangan,
+            'id_kategori' => $request->id_kategori,
         ]);
 
         return redirect()->route('barang.index')->with('success', 'Barang berhasil diperbarui.');

@@ -8,7 +8,7 @@ class DetailPembelian extends Model
     protected $table = 'detail_pembelian';
     public $timestamps = false;
 
-    protected $fillable = ['id_pembelian', 'kode_barang', 'jumlah', 'harga'];
+    protected $fillable = ['id_pembelian', 'kode_barang', 'jumlah', 'harga','margin','ppn'];
 
     public function pembelian()
     {

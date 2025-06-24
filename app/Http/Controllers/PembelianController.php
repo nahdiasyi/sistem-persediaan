@@ -1,68 +1,45 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Barang;
 use App\Models\Supplier;
 use App\Models\Pembelian;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use App\Models\DetailPembelian;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PembelianController extends Controller
 {
-    // public function index()
-    // {
-    //     $pembelians = Pembelian::with(['supplier', 'user', 'detailPembelian'])->get();
-    //     return view('pembelian.index', compact('pembelians'));
-    // }
-
-    // public function create()
-    // {
-    //     $suppliers = Supplier::all();
-    //     return view('pembelian.create', compact('suppliers'));
-    // }
-
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'id_supplier' => 'required',
-    //         'tanggal' => 'required|date',
-    //         'details' => 'required|array|min:1',
-    //     ]);
-
-    //     DB::transaction(function () use ($request) {
-    //         $idPembelian = 'PO' . str_pad(Pembelian::count() + 1, 3, '0', STR_PAD_LEFT);
-
-    //         Pembelian::create([
-    //             'id_pembelian' => $idPembelian,
-    //             'id_supplier' => $request->id_supplier,
-    //             'id_user' => session('user.id'), // OR Auth::id()
-    //             'tanggal' => $request->tanggal,
-    //         ]);
-
-    //         foreach ($request->details as $detail) {
-    //             DetailPembelian::create([
-    //                 'id_pembelian' => $idPembelian,
-    //                 'kode_barang' => $detail['kode_barang'],
-    //                 'jumlah' => $detail['jumlah'],
-    //                 'harga' => $detail['harga'],
-    //             ]);
-    //         }
-    //     });
-
-    //     return redirect()->route('pembelian.index')->with('success', 'Pembelian berhasil ditambahkan.');
-    // }
-
-    public function index()
+    public function index(Request $request)
     {
-        $pembelian = Pembelian::with(['supplier', 'user', 'detailPembelian.barang'])
-            ->orderBy('tanggal', 'desc')
-            ->get();
+        $query = Pembelian::with(['supplier', 'user', 'detailPembelian.barang']);
 
-        return view('pembelian.index', compact('pembelian'));
+        if ($request->filled('tanggal_dari')) {
+            $query->whereDate('tanggal', '>=', $request->tanggal_dari);
+        }
+
+        if ($request->filled('tanggal_sampai')) {
+            $query->whereDate('tanggal', '<=', $request->tanggal_sampai);
+        }
+
+        if ($request->filled('supplier')) {
+            $query->where('id_supplier', $request->supplier);
+        }
+
+        if ($request->filled('user')) {
+            $query->where('id_user', $request->user);
+        }
+
+        $pembelian = $query->orderBy('tanggal', 'desc')->get();
+
+        $suppliers = Supplier::orderBy('nama_supplier')->get();
+        $users = User::orderBy('nama_user')->get();
+
+        return view('pembelian.index', compact('pembelian', 'suppliers', 'users'));
     }
 
     public function create()
@@ -87,19 +64,16 @@ class PembelianController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
-            // Generate ID Pembelian
             $idPembelian = 'PB' . date('YmdHis');
 
-            // Simpan Pembelian
             $pembelian = Pembelian::create([
                 'id_pembelian' => $idPembelian,
                 'id_supplier' => $request->id_supplier,
                 'id_user' => Auth::user()->id_user,
+                'tanggal' => now(),
             ]);
 
-            // Simpan Detail Pembelian dan Update Barang
             foreach ($request->barang as $item) {
-                // Simpan Detail Pembelian
                 DetailPembelian::create([
                     'id_pembelian' => $idPembelian,
                     'kode_barang' => $item['kode_barang'],
@@ -107,19 +81,20 @@ class PembelianController extends Controller
                     'harga' => $item['harga'],
                 ]);
 
-                // Update Barang
                 $barang = Barang::where('kode_barang', $item['kode_barang'])->first();
                 if ($barang) {
                     $hargaBeli = $item['harga'];
                     $margin = ($hargaBeli * $item['margin']) / 100;
-                    $ppn = (($hargaBeli + $margin) * $item['pajak']) / 100;
-                    $hargaJual = $hargaBeli + $margin + $ppn;
+                    $pajak = ($hargaBeli * $item['pajak']) / 100;
+                    $hargaJual = $hargaBeli + $margin + $pajak;
+
+                    $stokBaru = $barang->stok + $item['jumlah'];
 
                     $barang->update([
-                        'stok' => $barang->stok + $item['jumlah'],
+                        'stok' => $stokBaru,
                         'harga_beli' => $hargaBeli,
                         'harga_jual' => $hargaJual,
-                        'keterangan' => ($barang->stok + $item['jumlah']) > 10 ? 'stok tersedia' : 'stok hampir habis'
+                        'keterangan' => $stokBaru > 10 ? 'stok tersedia' : 'stok hampir habis'
                     ]);
                 }
             }
@@ -130,7 +105,7 @@ class PembelianController extends Controller
 
     public function edit($id)
     {
-        $pembelian = Pembelian::with('detailPembelian')->findOrFail($id);
+        $pembelian = Pembelian::with(['detailPembelian', 'user'])->findOrFail($id);
         $suppliers = Supplier::all();
         $users = User::all();
         $barangs = Barang::all();
@@ -154,7 +129,6 @@ class PembelianController extends Controller
         DB::transaction(function () use ($request, $id) {
             $pembelian = Pembelian::findOrFail($id);
 
-            // Kembalikan stok lama
             foreach ($pembelian->detailPembelian as $detail) {
                 $barang = Barang::where('kode_barang', $detail->kode_barang)->first();
                 if ($barang) {
@@ -164,18 +138,15 @@ class PembelianController extends Controller
                 }
             }
 
-            // Hapus detail lama
             DetailPembelian::where('id_pembelian', $id)->delete();
 
-            // Update Pembelian
             $pembelian->update([
                 'id_supplier' => $request->id_supplier,
                 'id_user' => $request->id_user,
+                'tanggal' => $request->tanggal ?? now(),
             ]);
 
-            // Simpan Detail Pembelian Baru dan Update Barang
             foreach ($request->barang as $item) {
-                // Simpan Detail Pembelian
                 DetailPembelian::create([
                     'id_pembelian' => $id,
                     'kode_barang' => $item['kode_barang'],
@@ -183,7 +154,6 @@ class PembelianController extends Controller
                     'harga' => $item['harga'],
                 ]);
 
-                // Update Barang
                 $barang = Barang::where('kode_barang', $item['kode_barang'])->first();
                 if ($barang) {
                     $hargaBeli = $item['harga'];
@@ -191,11 +161,13 @@ class PembelianController extends Controller
                     $ppn = (($hargaBeli + $margin) * $item['pajak']) / 100;
                     $hargaJual = $hargaBeli + $margin + $ppn;
 
+                    $stokBaru = $barang->stok + $item['jumlah'];
+
                     $barang->update([
-                        'stok' => $barang->stok + $item['jumlah'],
+                        'stok' => $stokBaru,
                         'harga_beli' => $hargaBeli,
                         'harga_jual' => $hargaJual,
-                        'keterangan' => ($barang->stok + $item['jumlah']) > 10 ? 'stok tersedia' : 'stok hampir habis'
+                        'keterangan' => $stokBaru > 10 ? 'stok tersedia' : 'stok hampir habis'
                     ]);
                 }
             }
@@ -203,4 +175,6 @@ class PembelianController extends Controller
 
         return redirect()->route('pembelian.index')->with('success', 'Pembelian berhasil diupdate');
     }
+
+   
 }

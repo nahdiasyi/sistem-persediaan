@@ -1,64 +1,76 @@
+{{-- EDIT VIEW --}}
 @extends('layouts.app')
+
 @section('content')
 <div class="container">
-    <h4>Edit Penjualan</h4>
+    <h3>Edit Penjualan</h3>
     <form id="formPenjualan">
-        <div class="form-group">
+        @method('PUT')
+        <div class="form-group mb-3">
             <label>User</label>
             <select id="id_user" class="form-control" required>
                 <option value="">Pilih User</option>
                 @foreach($users as $u)
-                    <option value="{{ $u->id_user }}" {{ $penjualan->id_user == $u->id_user ? 'selected' : '' }}>
-                        {{ $u->nama }}
+                    <option value="{{ $u->id }}" {{ $penjualan->id_user == $u->id ? 'selected' : '' }}>
+                        {{ $u->name }}
                     </option>
                 @endforeach
             </select>
         </div>
 
-        <div class="form-group">
+        <div class="form-group mb-3">
             <label>Barang</label>
             <select id="kode_barang" class="form-control">
                 <option value="">Pilih Barang</option>
                 @foreach($barang as $b)
-                    <option value="{{ $b->kode_barang }}" data-harga="{{ $b->harga_jual }}">{{ $b->nama_barang }}</option>
+                    <option value="{{ $b->kode_barang }}" data-harga="{{ $b->harga }}">{{ $b->nama_barang }}</option>
                 @endforeach
             </select>
         </div>
 
-        <div class="form-group">
+        <div class="form-group mb-3">
             <label>Jumlah</label>
             <input type="number" id="jumlah" class="form-control" min="1">
         </div>
 
-        <button type="button" id="btnTambah" class="btn btn-info">Tambah ke Detail</button>
+        <button type="button" id="btnTambah" class="btn btn-info mb-3">Tambah ke Detail</button>
 
-        <table class="table mt-3">
+        <table class="table table-bordered">
             <thead>
-                <tr><th>Barang</th><th>Jumlah</th><th>Harga</th><th>Subtotal</th><th>Aksi</th></tr>
+                <tr>
+                    <th>Barang</th>
+                    <th>Jumlah</th>
+                    <th>Harga</th>
+                    <th>Subtotal</th>
+                    <th>Aksi</th>
+                </tr>
             </thead>
             <tbody id="tabelDetail"></tbody>
         </table>
 
-        <button type="button" id="btnSimpan" class="btn btn-success">Simpan</button>
+        <div class="mt-3">
+            <button type="button" id="btnSimpan" class="btn btn-success">Update</button>
+            <a href="{{ route('penjualan.index') }}" class="btn btn-secondary">Kembali</a>
+        </div>
     </form>
 </div>
 
 <script>
-// let details = {!! json_encode($penjualan->detailPenjualan->map(fn($d) => [
-//     'kode_barang' => $d->kode_barang,
-//     'jumlah' => $d->jumlah,
-//     'harga' => $d->harga,
-
-// ])) !!};
+let details = {!! json_encode($penjualan->detailPenjualan->map(fn($d) => [
+    'kode_barang' => $d->kode_barang,
+    'jumlah' => $d->jumlah,
+    'harga' => $d->harga,
+    'nama_barang' => $d->barang->nama_barang ?? $d->kode_barang,
+])) !!};
 
 function renderTable() {
     let html = '';
     details.forEach((d, i) => {
         html += `<tr>
-            <td>${d.kode_barang}</td>
+            <td>${d.nama_barang}</td>
             <td>${d.jumlah}</td>
-            <td>${d.harga}</td>
-            <td>${d.jumlah * d.harga}</td>
+            <td>Rp ${d.harga.toLocaleString('id-ID')}</td>
+            <td>Rp ${(d.jumlah * d.harga).toLocaleString('id-ID')}</td>
             <td><button onclick="hapus(${i})" class="btn btn-sm btn-danger">Hapus</button></td>
         </tr>`;
     });
@@ -78,7 +90,12 @@ document.getElementById('btnTambah').onclick = () => {
 
     if (!kode || !jumlah) return alert('Pilih barang dan isi jumlah');
 
-    details.push({ kode_barang: kode, jumlah: parseInt(jumlah), harga: parseInt(harga), nama_barang: nama });
+    details.push({
+        kode_barang: kode,
+        jumlah: parseInt(jumlah),
+        harga: parseInt(harga),
+        nama_barang: nama
+    });
     renderTable();
 
     document.getElementById('kode_barang').value = '';

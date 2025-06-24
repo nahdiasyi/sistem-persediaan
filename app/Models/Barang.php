@@ -13,6 +13,11 @@ class Barang extends Model
     // Nama tabel
     protected $table = 'barang';
 
+    public function detailPenjualan()
+        {
+            return $this->hasMany(\App\Models\DetailPenjualan::class, 'kode_barang', 'kode_barang');
+        }
+
     // Primary key
     protected $primaryKey = 'kode_barang';
     public $incrementing = false; // karena tipe VARCHAR
@@ -38,4 +43,6 @@ class Barang extends Model
     {
         return $this->belongsTo(Kategori::class, 'id_kategori', 'id_kategori');
     }
+
+
 }

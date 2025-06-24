@@ -7,7 +7,7 @@
                 <form method="GET" action="{{ route('dashboard') }}">
                     <div class="form-group">
                         <label for="month">Filter Bulan:</label>
-                        <input type="month" id="month" name="month" class="form-control" 
+                        <input type="month" id="month" name="month" class="form-control"
                                value="{{ $selected_month }}" onchange="this.form.submit()">
                     </div>
                 </form>
@@ -33,7 +33,7 @@
                 <div class="ibox bg-info color-white widget-stat">
                     <div class="ibox-body">
                         <h2 class="m-b-5 font-strong">{{ number_format($barang_masuk) }}</h2>
-                        <div class="m-b-5">BARANG MASUK</div>
+                        <div class="m-b-5">PEMBELIAN</div>
                         <i class="fa fa-arrow-up widget-stat-icon"></i>
                         <div>
                             <i class="fa {{ $persen_barang_masuk >= 0 ? 'fa-level-up text-success' : 'fa-level-down text-danger' }} m-r-5"></i>
@@ -46,7 +46,7 @@
                 <div class="ibox bg-warning color-white widget-stat">
                     <div class="ibox-body">
                         <h2 class="m-b-5 font-strong">{{ number_format($barang_keluar) }}</h2>
-                        <div class="m-b-5">BARANG KELUAR</div>
+                        <div class="m-b-5">PENJUALAN</div>
                         <i class="fa fa-arrow-down widget-stat-icon"></i>
                         <div>
                             <i class="fa {{ $persen_barang_keluar >= 0 ? 'fa-level-up text-success' : 'fa-level-down text-danger' }} m-r-5"></i>
@@ -59,7 +59,7 @@
                 <div class="ibox bg-success color-white widget-stat">
                     <div class="ibox-body">
                         <h2 class="m-b-5 font-strong">{{ number_format($total_persediaan) }}</h2>
-                        <div class="m-b-5">TOTAL PERSEDIAAN</div>
+                        <div class="m-b-5">STOK BARANG</div>
                         <i class="fa fa-boxes widget-stat-icon"></i>
                         <div><i class="fa fa-warehouse m-r-5"></i><small>Total stok gudang</small></div>
                     </div>
@@ -223,7 +223,7 @@
         </div>
         </div>
 @endsection
-        
+
         @push('scripts')
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                 <script>

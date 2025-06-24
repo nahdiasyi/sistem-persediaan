@@ -6,13 +6,15 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    protected $table = 'user'; // sesuai dengan nama tabel kamu
+    protected $table = 'user'; // nama tabel sesuai database
 
-    protected $primaryKey = 'id_user'; // karena bukan 'id'
+    protected $primaryKey = 'id_user'; // primary key
 
-    public $incrementing = false; // karena primary key varchar
+    public $incrementing = false; // karena varchar, bukan auto increment
 
-    protected $keyType = 'string'; // karena id_user varchar
+    protected $keyType = 'string'; // primary key string
+
+    public $timestamps = false; // **JANGAN BIARKAN LARAVEL OTOMATIS ISI created_at & updated_at**
 
     protected $fillable = [
         'id_user',
@@ -28,4 +30,3 @@ class User extends Authenticatable
         'password',
     ];
 }
-
