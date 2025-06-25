@@ -112,3 +112,5 @@ Route::prefix('kasir')->name('kasir.')->group(function () {
         Route::get('/barang/search', [KasirController::class, 'getBarang'])->name('barang.search');
         Route::get('/print/{id}', [KasirController::class, 'print'])->name('print');
     });
+
+    // test
