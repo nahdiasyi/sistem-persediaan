@@ -180,12 +180,28 @@
             </table>
         @endforeach
     @endif
+<!-- Signature Area -->
+    <div class="signature-container">
+        <table class="signature-table">
+            <tr>
+                <td class="signature-left">
+                    <div class="signature-title">Mengetahui</div>
+                    <div class="signature-line"></div>
+                    <div class="signature-name">( Owner )</div>
+                </td>
+                <td class="signature-right">
+                    <div class="signature-date">Yogyakarta, {{ date('d F Y') }}</div>
+                    <div class="signature-title"> Kasir</div>
+                    <div class="signature-line"></div>
+                    <div class="signature-name">( _________________ )</div>
+                </td>
+            </tr>
+        </table>
+    </div>
 
-    <div class="footer">
-        <p>{{ date('d F Y') }}</p>
-        <br><br><br>
-        <p>_____________________</p>
-        <p>Manager</p>
+   <div class="footer">
+        <p>Laporan ini digenerate secara otomatis oleh sistem</p>
+        <p>Halaman 1 dari 1</p>
     </div>
 </body>
 </html>

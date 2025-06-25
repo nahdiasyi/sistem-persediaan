@@ -303,8 +303,28 @@
     <strong>Total Nilai Stok (Beli):</strong> Rp{{ number_format($totalNilaiStok, 0, ',', '.') }}<br>
     <strong>Total Nilai Stok (Jual):</strong> Rp{{ number_format($totalNilaiJual, 0, ',', '.') }}
 
+    <!-- Signature Area -->
+    <div class="signature-container">
+        <table class="signature-table">
+            <tr>
+                <td class="signature-left">
+                    <div class="signature-title">Mengetahui</div>
+                    <div class="signature-line"></div>
+                    <div class="signature-name">( Owner )</div>
+                </td>
+                <td class="signature-right">
+                    <div class="signature-date">Yogyakarta, {{ date('d F Y') }}</div>
+                    <div class="signature-title"> Back Office</div>
+                    <div class="signature-line"></div>
+                    <div class="signature-name">( _________________ )</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
     <div class="footer">
-        <p>Laporan ini dibuat otomatis oleh sistem.</p>
+        <p>Laporan ini digenerate secara otomatis oleh sistem</p>
+        <p>Halaman 1 dari 1</p>
     </div>
 
 </body>

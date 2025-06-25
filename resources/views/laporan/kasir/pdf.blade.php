@@ -85,24 +85,48 @@
             font-size: 10px;
             color: #666;
         }
-        .detail-section {
-            margin-top: 20px;
+        .signature-container {
+            margin-top: 40px;
             page-break-inside: avoid;
         }
-        .detail-header {
-            background-color: #e9ecef;
-            padding: 8px;
+        .signature-table {
+            width: 100%;
+            border: none;
+        }
+        .signature-table td {
+            border: none;
+            padding: 20px;
+            vertical-align: top;
+            width: 50%;
+        }
+        .signature-left {
+            text-align: left;
+        }
+        .signature-right {
+            text-align: right;
+        }
+        .signature-date {
+            margin-bottom: 10px;
             font-weight: bold;
-            border: 1px solid #ddd;
         }
-        .detail-table {
-            font-size: 10px;
+        .signature-title {
+            margin-bottom: 60px;
+            font-weight: bold;
         }
-        .detail-table th, .detail-table td {
-            padding: 4px;
+        .signature-line {
+            border-bottom: 1px solid #333;
+            width: 200px;
+            margin-bottom: 5px;
         }
-        .page-break {
-            page-break-before: always;
+        .signature-left .signature-line {
+            margin-left: 0;
+        }
+        .signature-right .signature-line {
+            margin-left: auto;
+            margin-right: 0;
+        }
+        .signature-name {
+            font-weight: bold;
         }
     </style>
 </head>
@@ -131,26 +155,6 @@
         @endif
     </div>
 
-    <!-- Statistik -->
-    <div class="statistik">
-        <div class="stat-card">
-            <h4>{{ number_format($statistik['total_transaksi']) }}</h4>
-            <p>Total Transaksi</p>
-        </div>
-        <div class="stat-card">
-            <h4>{{ number_format($statistik['total_item']) }}</h4>
-            <p>Total Item</p>
-        </div>
-        <div class="stat-card">
-            <h4>Rp {{ number_format($statistik['total_nilai'], 0, ',', '.') }}</h4>
-            <p>Total Nilai</p>
-        </div>
-        <div class="stat-card">
-            <h4>{{ number_format($statistik['user_aktif']) }}</h4>
-            <p>User Aktif</p>
-        </div>
-    </div>
-
     <!-- Tabel Ringkasan -->
     <table>
         <thead>
@@ -169,7 +173,7 @@
                 <td class="text-center">{{ $index + 1 }}</td>
                 <td>{{ $item->id_penjualan }}</td>
                 <td class="text-center">{{ $item->tanggal->format('d/m/Y H:i') }}</td>
-                <td>{{ $item->user->name ?? '-' }}</td>
+                <td>{{ $item->user->nama_user ?? '-' }}</td>
                 <td class="text-center">{{ $item->detailPenjualan->sum('jumlah') }}</td>
                 <td class="text-right">Rp {{ number_format($item->detailPenjualan->sum(function($detail) { return $detail->jumlah * $detail->harga; }), 0, ',', '.') }}</td>
             </tr>
@@ -184,47 +188,26 @@
         </tfoot>
     </table>
 
-    <!-- Detail Transaksi -->
-    @if($penjualan->count() > 0)
-    <div class="page-break"></div>
-    <h2>DETAIL TRANSAKSI</h2>
 
-    @foreach($penjualan as $item)
-    <div class="detail-section">
-        <div class="detail-header">
-            {{ $item->id_penjualan }} - {{ $item->tanggal->format('d/m/Y H:i') }} - Kasir: {{ $item->user->name ?? '-' }}
-        </div>
-        <table class="detail-table">
-            <thead>
-                <tr>
-                    <th>Kode</th>
-                    <th>Nama Barang</th>
-                    <th>Jumlah</th>
-                    <th>Harga</th>
-                    <th>Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($item->detailPenjualan as $detail)
-                <tr>
-                    <td>{{ $detail->kode_barang }}</td>
-                    <td>{{ $detail->barang->nama_barang ?? '-' }}</td>
-                    <td class="text-center">{{ $detail->jumlah }}</td>
-                    <td class="text-right">Rp {{ number_format($detail->harga, 0, ',', '.') }}</td>
-                    <td class="text-right">Rp {{ number_format($detail->jumlah * $detail->harga, 0, ',', '.') }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-            <tfoot>
-                <tr style="background-color: #f8f9fa; font-weight: bold;">
-                    <td colspan="4" class="text-right">Total:</td>
-                    <td class="text-right">Rp {{ number_format($item->detailPenjualan->sum(function($detail) { return $detail->jumlah * $detail->harga; }), 0, ',', '.') }}</td>
-                </tr>
-            </tfoot>
+
+    <!-- Signature Area -->
+    <div class="signature-container">
+        <table class="signature-table">
+            <tr>
+                <td class="signature-left">
+                    <div class="signature-title">Mengetahui</div>
+                    <div class="signature-line"></div>
+                    <div class="signature-name">( Owner )</div>
+                </td>
+                <td class="signature-right">
+                    <div class="signature-date">Yogyakarta, {{ date('d F Y') }}</div>
+                    <div class="signature-title"> Kasir</div>
+                    <div class="signature-line"></div>
+                    <div class="signature-name">( _________________ )</div>
+                </td>
+            </tr>
         </table>
     </div>
-    @endforeach
-    @endif
 
     <!-- Footer -->
     <div class="footer">
